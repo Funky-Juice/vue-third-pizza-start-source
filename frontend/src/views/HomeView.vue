@@ -63,13 +63,18 @@
               <div class="ingredients__sauce">
                 <p>Основной соус:</p>
 
-                <label class="radio ingredients__input">
-                  <input type="radio" name="sauce" value="tomato" checked />
-                  <span>Томатный</span>
-                </label>
-                <label class="radio ingredients__input">
-                  <input type="radio" name="sauce" value="creamy" />
-                  <span>Сливочный</span>
+                <label
+                  v-for="(sauce, index) in normalizedPizzaSauces"
+                  :key="sauce.id"
+                  class="radio ingredients__input"
+                >
+                  <input
+                    type="radio"
+                    name="sauce"
+                    :value="sauce.type"
+                    :checked="index === 0"
+                  />
+                  <span>{{ sauce.name }}</span>
                 </label>
               </div>
 
@@ -489,20 +494,29 @@
 </template>
 
 <script setup>
-import doughSizes from "../common/enums/doughSizes";
-import pizzaSizes from "../common/enums/sizes.js";
-import doughTypes from "../mocks/dough.json";
-import piazzaSizesTypes from "../mocks/sizes.json";
+import doughSizesEnum from "../common/enums/doughSizes";
+import pizzaSizesEnum from "../common/enums/sizes.js";
+import pizzaSaucesEnum from "../common/enums/sauces.js";
+
+import doughTypesData from "../mocks/dough.json";
+import pizzaSizesData from "../mocks/sizes.json";
+import saucesTypesData from "../mocks/sauces.json";
 
 import { normalizeDataObj } from "../common/helpers.js";
 
-const normalizedDoughTypes = doughTypes.map((doughObj) =>
-  normalizeDataObj(doughObj, doughSizes),
+const normalizedDoughTypes = doughTypesData.map((doughObj) =>
+  normalizeDataObj(doughObj, doughSizesEnum),
 );
 
-const normalizedPizzaSizes = piazzaSizesTypes.map((sizeObj) =>
-  normalizeDataObj(sizeObj, pizzaSizes),
+const normalizedPizzaSizes = pizzaSizesData.map((sizeObj) =>
+  normalizeDataObj(sizeObj, pizzaSizesEnum),
 );
+
+const normalizedPizzaSauces = saucesTypesData.map((sizeObj) =>
+  normalizeDataObj(sizeObj, pizzaSaucesEnum),
+);
+
 console.log(normalizedDoughTypes);
 console.log(normalizedPizzaSizes);
+console.log(normalizedPizzaSauces);
 </script>
