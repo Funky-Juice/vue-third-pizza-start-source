@@ -22,6 +22,8 @@
                   :value="dough.type"
                   :checked="index === 0"
                 />
+                <img :src="getImage(dough.image)" :alt="dough.name" />
+
                 <b>{{ dough.name }}</b>
                 <span>{{ dough.description }}</span>
               </label>
@@ -87,12 +89,13 @@
                     :key="ingredient.id"
                     class="ingredients__item"
                   >
-                    <span
-                      class="filling"
-                      :class="`filling--${ingredient.type}`"
-                    >
+                    <div class="filling" :class="`filling--${ingredient.type}`">
+                      <img
+                        :src="getImage(ingredient.image)"
+                        :alt="ingredient.name"
+                      />
                       {{ ingredient.name }}
-                    </span>
+                    </div>
 
                     <div class="counter counter--orange ingredients__counter">
                       <button
@@ -163,7 +166,7 @@ import pizzaSizesData from "../mocks/sizes.json";
 import saucesTypesData from "../mocks/sauces.json";
 import pizzaIngredientsData from "../mocks/ingredients.json";
 
-import { normalizeDataObj } from "../common/helpers.js";
+import { normalizeDataObj, getImage } from "../common/helpers.js";
 
 const normalizedDoughTypes = doughTypesData.map((doughObj) =>
   normalizeDataObj(doughObj, doughSizesEnum),
