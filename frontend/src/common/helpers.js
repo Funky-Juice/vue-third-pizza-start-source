@@ -1,8 +1,6 @@
-import doughSizes from "./enums/doughSizes";
-
-export const normalizeDoughTypeObj = (data) => {
+export const normalizeDataObj = (data, enumObj) => {
   return {
     ...data,
-    type: data.id ? doughSizes[data.id] : "",
+    type: data.id ? enumObj[data.id] : "",
   };
 };

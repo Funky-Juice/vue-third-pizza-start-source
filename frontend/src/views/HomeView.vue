@@ -34,33 +34,20 @@
             <h2 class="title title--small sheet__title">Выберите размер</h2>
 
             <div class="sheet__content diameter">
-              <label class="diameter__input diameter__input--small">
+              <label
+                v-for="(size, index) in normalizedPizzaSizes"
+                :key="size.id"
+                class="diameter__input"
+                :class="`diameter__input--${size.type}`"
+              >
                 <input
                   type="radio"
                   name="diameter"
-                  value="small"
+                  :value="size.type"
                   class="visually-hidden"
+                  :checked="index === 1"
                 />
-                <span>23 см</span>
-              </label>
-              <label class="diameter__input diameter__input--normal">
-                <input
-                  type="radio"
-                  name="diameter"
-                  value="normal"
-                  class="visually-hidden"
-                  checked
-                />
-                <span>32 см</span>
-              </label>
-              <label class="diameter__input diameter__input--big">
-                <input
-                  type="radio"
-                  name="diameter"
-                  value="big"
-                  class="visually-hidden"
-                />
-                <span>45 см</span>
+                <span>{{ size.name }}</span>
               </label>
             </div>
           </div>
@@ -502,11 +489,20 @@
 </template>
 
 <script setup>
+import doughSizes from "../common/enums/doughSizes";
+import pizzaSizes from "../common/enums/sizes.js";
 import doughTypes from "../mocks/dough.json";
-import { normalizeDoughTypeObj } from "../common/helpers.js";
+import piazzaSizesTypes from "../mocks/sizes.json";
+
+import { normalizeDataObj } from "../common/helpers.js";
 
 const normalizedDoughTypes = doughTypes.map((doughObj) =>
-  normalizeDoughTypeObj(doughObj),
+  normalizeDataObj(doughObj, doughSizes),
+);
+
+const normalizedPizzaSizes = piazzaSizesTypes.map((sizeObj) =>
+  normalizeDataObj(sizeObj, pizzaSizes),
 );
 console.log(normalizedDoughTypes);
+console.log(normalizedPizzaSizes);
 </script>
