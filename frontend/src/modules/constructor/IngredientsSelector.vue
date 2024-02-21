@@ -57,7 +57,7 @@ import AppDrag from "@/common/components/AppDrag.vue";
 import { MAX_INGREDIENT_COUNT } from "@/common/constants";
 
 const props = defineProps({
-  values: {
+  modelValue: {
     type: Object,
     default: () => ({}),
   },
@@ -67,10 +67,10 @@ const props = defineProps({
   },
 });
 const emit = defineEmits(["update"]);
-const values = toRef(props, "values");
+const modelValue = toRef(props, "modelValue");
 
 const getValue = (ingredient) => {
-  return values.value[ingredient] ?? 0;
+  return modelValue.value[ingredient] ?? 0;
 };
 
 const setValue = (ingredient, count) => {
