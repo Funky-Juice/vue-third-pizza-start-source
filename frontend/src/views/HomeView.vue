@@ -4,56 +4,9 @@
       <div class="content__wrapper">
         <h1 class="title title--big">Конструктор пиццы</h1>
 
-        <div class="content__dough">
-          <div class="sheet">
-            <h2 class="title title--small sheet__title">Выберите тесто</h2>
+        <dough-selector v-model="pizzaModel.dough" :items="doughItems" />
 
-            <div class="sheet__content dough">
-              <label
-                v-for="(dough, index) in normalizedDoughTypes"
-                :key="dough.id"
-                class="dough__input"
-                :class="`dough__input--${dough.type}`"
-              >
-                <input
-                  type="radio"
-                  name="dought"
-                  class="visually-hidden"
-                  :value="dough.type"
-                  :checked="index === 0"
-                />
-                <img :src="getImage(dough.image)" :alt="dough.name" />
-
-                <b>{{ dough.name }}</b>
-                <span>{{ dough.description }}</span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="content__diameter">
-          <div class="sheet">
-            <h2 class="title title--small sheet__title">Выберите размер</h2>
-
-            <div class="sheet__content diameter">
-              <label
-                v-for="(size, index) in normalizedPizzaSizes"
-                :key="size.id"
-                class="diameter__input"
-                :class="`diameter__input--${size.type}`"
-              >
-                <input
-                  type="radio"
-                  name="diameter"
-                  :value="size.type"
-                  class="visually-hidden"
-                  :checked="index === 1"
-                />
-                <span>{{ size.name }}</span>
-              </label>
-            </div>
-          </div>
-        </div>
+        <diameter-selector v-model="pizzaModel.size" :items="sizeItems" />
 
         <div class="content__ingredients">
           <div class="sheet">
@@ -62,65 +15,13 @@
             </h2>
 
             <div class="sheet__content ingredients">
-              <div class="ingredients__sauce">
-                <p>Основной соус:</p>
+              <sauce-selector v-model="pizzaModel.sauce" :items="sauceItems" />
 
-                <label
-                  v-for="(sauce, index) in normalizedPizzaSauces"
-                  :key="sauce.id"
-                  class="radio ingredients__input"
-                >
-                  <input
-                    type="radio"
-                    name="sauce"
-                    :value="sauce.type"
-                    :checked="index === 0"
-                  />
-                  <span>{{ sauce.name }}</span>
-                </label>
-              </div>
-
-              <div class="ingredients__filling">
-                <p>Начинка:</p>
-
-                <ul class="ingredients__list">
-                  <li
-                    v-for="ingredient in normalizedPizzaIngredients"
-                    :key="ingredient.id"
-                    class="ingredients__item"
-                  >
-                    <div class="filling" :class="`filling--${ingredient.type}`">
-                      <img
-                        :src="getImage(ingredient.image)"
-                        :alt="ingredient.name"
-                      />
-                      {{ ingredient.name }}
-                    </div>
-
-                    <div class="counter counter--orange ingredients__counter">
-                      <button
-                        type="button"
-                        class="counter__button counter__button--minus"
-                        disabled
-                      >
-                        <span class="visually-hidden">Меньше</span>
-                      </button>
-                      <input
-                        type="text"
-                        name="counter"
-                        class="counter__input"
-                        value="0"
-                      />
-                      <button
-                        type="button"
-                        class="counter__button counter__button--plus"
-                      >
-                        <span class="visually-hidden">Больше</span>
-                      </button>
-                    </div>
-                  </li>
-                </ul>
-              </div>
+              <ingredients-selector
+                v-model="pizzaModel.ingredients"
+                :items="ingredientItems"
+                @update="updateIngredientAmount"
+              />
             </div>
           </div>
         </div>
@@ -129,25 +30,25 @@
           <label class="input">
             <span class="visually-hidden">Название пиццы</span>
             <input
+              v-model="pizzaModel.name"
               type="text"
               name="pizza_name"
               placeholder="Введите название пиццы"
             />
           </label>
 
-          <div class="content__constructor">
-            <div class="pizza pizza--foundation--big-tomato">
-              <div class="pizza__wrapper">
-                <div class="pizza__filling pizza__filling--ananas"></div>
-                <div class="pizza__filling pizza__filling--bacon"></div>
-                <div class="pizza__filling pizza__filling--cheddar"></div>
-              </div>
-            </div>
-          </div>
+          <pizza-constructor
+            :dough="pizzaModel.dough"
+            :sauce="pizzaModel.sauce"
+            :ingredients="pizzaModel.ingredients"
+            @drop="addIngredient"
+          />
 
           <div class="content__result">
-            <p>Итого: 0 ₽</p>
-            <button type="button" class="button" disabled>Готовьте!</button>
+            <p>Итого: {{ price }} ₽</p>
+            <button type="button" class="button" :disabled="disableSubmit">
+              Готовьте!
+            </button>
           </div>
         </div>
       </div>
@@ -156,6 +57,8 @@
 </template>
 
 <script setup>
+import { reactive, computed } from "vue";
+
 import doughSizesEnum from "../common/enums/doughSizes";
 import pizzaSizesEnum from "../common/enums/sizes.js";
 import pizzaSaucesEnum from "../common/enums/sauces.js";
@@ -166,28 +69,76 @@ import pizzaSizesData from "../mocks/sizes.json";
 import saucesTypesData from "../mocks/sauces.json";
 import pizzaIngredientsData from "../mocks/ingredients.json";
 
-import { normalizeDataObj, getImage } from "../common/helpers.js";
+import { normalizeDataObj } from "../common/helpers.js";
 
-const normalizedDoughTypes = doughTypesData.map((doughObj) =>
+import DoughSelector from "@/modules/constructor/DoughSelector.vue";
+import DiameterSelector from "@/modules/constructor/DiameterSelector.vue";
+import SauceSelector from "@/modules/constructor/SauceSelector.vue";
+import IngredientsSelector from "@/modules/constructor/IngredientsSelector.vue";
+import PizzaConstructor from "@/modules/constructor/PizzaConstructor.vue";
+
+const doughItems = doughTypesData.map((doughObj) =>
   normalizeDataObj(doughObj, doughSizesEnum),
 );
 
-const normalizedPizzaSizes = pizzaSizesData.map((sizeObj) =>
+const sizeItems = pizzaSizesData.map((sizeObj) =>
   normalizeDataObj(sizeObj, pizzaSizesEnum),
 );
 
-const normalizedPizzaSauces = saucesTypesData.map((sizeObj) =>
+const sauceItems = saucesTypesData.map((sizeObj) =>
   normalizeDataObj(sizeObj, pizzaSaucesEnum),
 );
 
-const normalizedPizzaIngredients = pizzaIngredientsData.map((sizeObj) =>
+const ingredientItems = pizzaIngredientsData.map((sizeObj) =>
   normalizeDataObj(sizeObj, pizzaIngredientsEnum),
 );
 
-console.log(normalizedDoughTypes);
-console.log(normalizedPizzaSizes);
-console.log(normalizedPizzaSauces);
-console.log(normalizedPizzaIngredients);
+const pizzaModel = reactive({
+  name: "",
+  dough: doughItems[0].value,
+  size: sizeItems[0].value,
+  sauce: sauceItems[0].value,
+  ingredients: ingredientItems.reduce((acc, item) => {
+    acc[item.value] = 0;
+    return acc;
+  }, {}),
+});
+
+const price = computed(() => {
+  const { dough, size, sauce, ingredients } = pizzaModel;
+
+  const sizeMultiplier =
+    sizeItems.find((item) => item.value === size)?.multiplier ?? 1;
+
+  const doughPrice =
+    doughItems.find((item) => item.value === dough)?.price ?? 0;
+
+  const saucePrice =
+    sauceItems.find((item) => item.value === sauce)?.price ?? 0;
+
+  /*
+   * Здесь мы при помощи метода map превращаем массив ингредиентов
+   * в массив значений, соответствующих итоговой стоимости каждого из них - просто умножив известную цену на количество.
+   * После чего методом reduce вычисляем сумму всех элементов массива, что даст нам общую стоимость всех ингредиентов.
+   */
+  const ingredientsPrice = ingredientItems
+    .map((item) => ingredients[item.value] * item.price)
+    .reduce((acc, item) => acc + item, 0);
+
+  return (doughPrice + saucePrice + ingredientsPrice) * sizeMultiplier;
+});
+
+const disableSubmit = computed(() => {
+  return pizzaModel.name.length === 0 || price.value === 0;
+});
+
+const addIngredient = (ingredient) => {
+  pizzaModel.ingredients[ingredient]++;
+};
+
+const updateIngredientAmount = (ingredient, count) => {
+  pizzaModel.ingredients[ingredient] = count;
+};
 </script>
 
 <style lang="scss">
