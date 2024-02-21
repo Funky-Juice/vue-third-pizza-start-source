@@ -8,6 +8,7 @@
           v-for="doughType in items"
           :key="doughType.id"
           class="dough__input"
+          :class="`dough__input--${doughType.value}`"
         >
           <input
             type="radio"
