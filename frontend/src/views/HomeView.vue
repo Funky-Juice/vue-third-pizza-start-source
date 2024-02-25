@@ -59,17 +59,17 @@
 <script setup>
 import { reactive, computed } from "vue";
 
-import doughSizesEnum from "../common/enums/doughSizes";
-import pizzaSizesEnum from "../common/enums/sizes.js";
-import pizzaSaucesEnum from "../common/enums/sauces.js";
-import pizzaIngredientsEnum from "../common/enums/ingredients.js";
+import doughJSON from "../mocks/dough.json";
+import sizesJSON from "../mocks/sizes.json";
+import saucesJSON from "../mocks/sauces.json";
+import ingredientsJSON from "../mocks/ingredients.json";
 
-import doughTypesData from "../mocks/dough.json";
-import pizzaSizesData from "../mocks/sizes.json";
-import saucesTypesData from "../mocks/sauces.json";
-import pizzaIngredientsData from "../mocks/ingredients.json";
-
-import { normalizeDataObj } from "../common/helpers.js";
+import {
+  normalizeSauces,
+  normalizeDough,
+  normalizeSize,
+  normalizeIngredients,
+} from "@/common/helpers/normalize.js";
 
 import DoughSelector from "@/modules/constructor/DoughSelector.vue";
 import DiameterSelector from "@/modules/constructor/DiameterSelector.vue";
@@ -77,21 +77,10 @@ import SauceSelector from "@/modules/constructor/SauceSelector.vue";
 import IngredientsSelector from "@/modules/constructor/IngredientsSelector.vue";
 import PizzaConstructor from "@/modules/constructor/PizzaConstructor.vue";
 
-const doughItems = doughTypesData.map((doughObj) =>
-  normalizeDataObj(doughObj, doughSizesEnum),
-);
-
-const sizeItems = pizzaSizesData.map((sizeObj) =>
-  normalizeDataObj(sizeObj, pizzaSizesEnum),
-);
-
-const sauceItems = saucesTypesData.map((sizeObj) =>
-  normalizeDataObj(sizeObj, pizzaSaucesEnum),
-);
-
-const ingredientItems = pizzaIngredientsData.map((sizeObj) =>
-  normalizeDataObj(sizeObj, pizzaIngredientsEnum),
-);
+const doughItems = doughJSON.map(normalizeDough);
+const sizeItems = sizesJSON.map(normalizeSize);
+const sauceItems = saucesJSON.map(normalizeSauces);
+const ingredientItems = ingredientsJSON.map(normalizeIngredients);
 
 const pizzaModel = reactive({
   name: "",
