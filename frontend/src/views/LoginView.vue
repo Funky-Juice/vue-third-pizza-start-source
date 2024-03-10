@@ -6,7 +6,7 @@
     <div class="sign-form__title">
       <h1 class="title title--small">Авторизуйтесь на сайте</h1>
     </div>
-    <form action="#" method="post">
+    <form method="post" @submit.prevent="login">
       <div class="sign-form__input">
         <label class="input">
           <span>E-mail</span>
@@ -31,20 +31,51 @@
         </label>
       </div>
       <button type="submit" class="button">Авторизоваться</button>
+
+      <div class="server-error">
+        {{ errorMessage }}
+      </div>
     </form>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import { useRouter } from "vue-router";
+
+const authStore = useAuthStore();
+const router = useRouter();
 
 const email = ref("");
 const password = ref("");
+const errorMessage = ref(null);
+
+const login = async () => {
+  const resMsg = await authStore.login({
+    email: email.value,
+    password: password.value,
+  });
+
+  /* При успешной авторизации перенаправляем пользователя на главную страницу */
+  if (resMsg === "success") {
+    await authStore.whoami();
+    await router.push({ name: "home" });
+  } else {
+    errorMessage.value = resMsg;
+  }
+};
 </script>
 
 <style lang="scss" scoped>
 @import "@/assets/scss/ds-system/ds.scss";
 @import "@/assets/scss/mixins/mixins.scss";
+
+.server-error {
+  height: 16px;
+  color: $red-800;
+  margin-top: 20px;
+}
 
 .sign-form {
   @include pf_center-all;
