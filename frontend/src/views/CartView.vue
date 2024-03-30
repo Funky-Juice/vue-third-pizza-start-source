@@ -21,7 +21,7 @@
           >
             <div class="product cart-list__product">
               <img
-                :src="getImage('product.svg')"
+                :src="getPublicImage('product.svg')"
                 class="product__img"
                 width="56"
                 height="56"
@@ -72,7 +72,7 @@
             >
               <p class="additional-list__description">
                 <img
-                  :src="getImage(`${misc.image}.svg`)"
+                  :src="getPublicImage(`${misc.image}.svg`)"
                   width="39"
                   height="60"
                   alt="Coca-Cola 0,5 литра"
@@ -185,6 +185,7 @@ import { usePizzaStore } from "@/stores/pizza";
 import { useProfileStore } from "@/stores/profile";
 
 import AppCounter from "@/common/components/AppCounter.vue";
+import { getPublicImage } from "@/common/helpers/public-image.js";
 
 const router = useRouter();
 
@@ -194,10 +195,6 @@ const profileStore = useProfileStore();
 
 const deliveryOption = ref("self");
 const value = ref(0);
-
-const getImage = (image) => {
-  return new URL(`../assets/img/${image}`, import.meta.url).href;
-};
 
 const phone = computed({
   get() {
@@ -529,7 +526,7 @@ const submit = async () => {
   border-radius: 8px;
   outline: none;
   background-color: $silver-100;
-  background-image: url("@/assets/img/select.svg");
+  background-image: url("/api/public/img/select.svg");
   background-repeat: no-repeat;
   background-position: right 8px center;
 
