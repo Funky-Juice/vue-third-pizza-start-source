@@ -1,0 +1,16 @@
+/* Стили */
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 1s ease-in-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+}
